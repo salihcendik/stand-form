@@ -1,0 +1,62 @@
+<!--
+  @last modified on  : 03-21-2023
+  @last modified by  : salihcendik
+-->
+<template>
+    <div class="slds-combobox_container" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+        <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open">
+
+            <!-- Search Input Box -->
+            <template if:false={showPill}>
+                <span onkeypress={handleRecordSearch}>
+                    <lightning-input autocomplete="off" data-id={inputId} onclick={handleRecordSearch}
+                        placeholder={inputPlaceholder} type="search" variant="label-hidden">
+                    </lightning-input>
+                </span>
+
+                <div if:true={showLoadingSpinner}>
+                    <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                </div>
+            </template>
+
+            <!-- Selected Value Pill -->
+            <div if:true={showPill}>
+                <div class="slds-form-element slds-pill_container">
+                    <div class="slds-form-element__control">
+                        <lightning-pill label={selectedSearchResult.label} name={inputId} onremove={handleRemoveSelect}>
+                            <lightning-avatar src={selectedSearchResult.image}
+                                fallback-icon-name={selectedSearchResult.icon} size="x-small"></lightning-avatar>
+                        </lightning-pill>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dropdown List -->
+            <template if:true={showDropdown}>
+                <div class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid">
+                    <ul class="slds-listbox slds-listbox_vertical" data-id={inputDataId}>
+                        <template for:each={searchResults} for:item="searchResult">
+                            <li key={searchResult.recordId} data-input={inputId} data-key={searchResult.recordId}
+                                data-label={searchResult.label} class="slds-listbox__item"
+                                onclick={handleSearchResultSelection} onmousedown={handleSearchResultSelection}>
+                                <div class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta"
+                                    role="option">
+                                    <lightning-icon class="slds-media__figure slds-listbox__option-icon"
+                                        icon-name={searchResult.icon} alternative-text="icon"
+                                        size="small"></lightning-icon>
+
+                                    <span class="slds-media__body">
+                                        <span
+                                            class="slds-listbox__option-text slds-listbox__option-text_entity">{searchResult.label}</span>
+                                        <span
+                                            class="slds-listbox__option-meta slds-listbox__option-meta_entity">{searchResult.secondaryLabel}</span>
+                                    </span>
+                                </div>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </template>
+        </div>
+    </div>
+</template>

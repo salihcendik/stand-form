@@ -1,0 +1,287 @@
+<!--
+  @author            : salihcendik
+  @last modified on  : 30-09-2023
+  @last modified by  : salih.cendik
+-->
+<template>
+    <lightning-spinner if:true={showSpinner} alternative-text="Loading" size="medium"
+        variant="brand"></lightning-spinner>
+
+    <!-- Page Header Starts -->
+    <div class="slds-page-header" role="banner">
+        <div class="slds-grid slds-wrap">
+            <div class="slds-col">
+                <div class="slds-media slds-no-space slds-grow">
+                    <div class="slds-media__figure">
+                        <lightning-icon icon-name="action:manage_perm_sets" alternative-text="New"
+                            title="Stand Form"></lightning-icon>
+                    </div>
+                    <div class="slds-media__body">
+                        <p class="slds-text-title_caps">{label.trStandForm_Header1}
+                        </p>
+                        <h1 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate"
+                            title="">{label.trStandForm_Header2}
+                        </h1>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-large-col_bump-left">
+                <button class="slds-button slds-button_brand" onclick={handleSave}>{label.trStandForm_Save}</button>
+            </div>
+        </div>
+    </div>
+    <!-- Page Header Ends -->
+
+    <!-- Stand Starts -->
+    <article class="slds-card slds-m-vertical_small">
+        <div class="slds-card__body">
+            <lightning-layout class="slds-m-left_small" multiple-rows>
+                <!-- Shop Starts -->
+                <lightning-layout-item size="6" padding="horizontal-small">
+                    <div class="slds-form-element validate" lwc:ref="shopLayout">
+                        <label class="slds-form-element__label" for="select-01">
+                            <abbr class="slds-required" title="required">*</abbr>{label.trStandForm_Shop}</label>
+                        <c-lwc-look-up input-id="shop" input-data-id="shop" input-placeholder="Search Shop"
+                            input-required="true" input-search={handleShopSearch}
+                            input-selected-record-id={selectedShop.Id} input-selected-label={selectedShop.Name}
+                            input-selected-icon="standard:account" input-additional-criteria={shopSearchFilter}
+                            oninputselect={handleShopSelect}></c-lwc-look-up>
+                    </div>
+                    <template if:true={isBlankShop}>
+                        <div class="slds-form-element__help slds-text-color_error">{label.requiredField}</div>
+                    </template>
+                </lightning-layout-item>
+                <!-- Shop Ends -->
+
+                <!-- Stand Status Starts -->
+                <lightning-layout-item size="6" padding="horizontal-small">
+                    <div class="slds-form-element">
+                        <lightning-combobox name="StandStatus" label={label.trStandForm_StandStatus}
+                            value={selectedStandStatus} placeholder="" options={standStatusOptions} required="true"
+                            onchange={handleStandStatusChange}>
+                        </lightning-combobox>
+                        <template if:true={isBlankStandStatus}>
+                            <div class="slds-form-element__help slds-text-color_error">{label.requiredField}</div>
+                        </template>
+                    </div>
+                </lightning-layout-item>
+                <!-- Stand Status Ends -->
+
+                <!-- Width (cm) Starts -->
+                <lightning-layout-item size="6" padding="horizontal-small">
+                    <div class="slds-form-element">
+                        <lightning-input type="number" name="width" label={label.trStandForm_Width}
+                            field-level-help={label.trStandForm_Width_HelpText} required={shouldGeneratePanels}
+                            onchange={handleWidthChange}></lightning-input>
+                    </div>
+                    <template if:true={isBlankWidth}>
+                        <div class="slds-form-element__help slds-text-color_error">{label.requiredField}</div>
+                    </template>
+                </lightning-layout-item>
+                <!-- Width (cm) Ends -->
+
+                <!-- Stand Type Starts -->
+                <!--
+                <lightning-layout-item size="6" padding="horizontal-small">
+                    <div class="slds-form-element">
+                        <lightning-combobox name="StandType" lwc:ref="standTypeLayout"
+                            label={label.trStandForm_StandType} value={selectedStandType} placeholder=""
+                            options={standTypeOptions} required="true" onchange={handleStandTypeChange}>
+                        </lightning-combobox>
+                    </div>
+                    <template if:true={isBlankStandType}>
+                        <div class="slds-form-element__help slds-text-color_error">{label.requiredField}</div>
+                    </template>
+                </lightning-layout-item>
+                -->
+                <!-- Stand Type Ends -->
+
+
+                <!-- Stand Code Starts -->
+                <lightning-layout-item size="6" padding="horizontal-small">
+                    <div class="slds-form-element" lwc:ref="standCodeLayout">
+                        <label class="slds-form-element__label" for="select-01">
+                            <abbr class="slds-required" title="required">*</abbr>{label.trStandForm_StandCode}</label>
+                        <lightning-helptext content={label.trStandForm_StandCode_HelpText}></lightning-helptext>
+                        <c-lwc-look-up lwc:ref="standCodeLookup" input-id="standCode" input-data-id="standCode"
+                            input-placeholder="Search Stand Code" input-required="true"
+                            input-search={handleStandCodeSearch} input-selected-record-id={selectedStandCode.Id}
+                            input-selected-label={selectedStandCode.Name} input-selected-icon="standard:product"
+                            input-additional-criteria={standCodeSearchFilter}
+                            oninputselect={handleStandCodeSelect}></c-lwc-look-up>
+                    </div>
+                    <template if:true={isBlankStandCode}>
+                        <div class="slds-form-element__help slds-text-color_error">{label.requiredField}</div>
+                    </template>
+                </lightning-layout-item>
+                <!-- Stand Code Ends -->
+
+                <!-- Height (cm) Starts -->
+                <lightning-layout-item size="6" padding="horizontal-small">
+                    <div class="slds-form-element">
+                        <lightning-input type="number" name="height" label={label.trStandForm_Height}
+                            field-level-help={label.trStandForm_Height_HelpText} required={shouldGeneratePanels}
+                            onchange={handleHeightChange}></lightning-input>
+                    </div>
+                    <template if:true={isBlankHeight}>
+                        <div class="slds-form-element__help slds-text-color_error">{label.requiredField}</div>
+                    </template>
+                </lightning-layout-item>
+                <!-- Height (cm) Ends -->
+
+                <!-- Desc for Other Starts -->
+                <template if:true={showDescForOther}>
+                    <lightning-layout-item size="6" padding="horizontal-small">
+                        <div class="slds-form-element">
+                            <lightning-input type="text" name="descforOther" label={label.trStandForm_DescforOther}
+                                required={showDescForOther} onchange={handleDescForOtherChange}></lightning-input>
+                        </div>
+                        <template if:true={isBlankDescForOther}>
+                            <div class="slds-form-element__help slds-text-color_error">{label.requiredField}</div>
+                        </template>
+                    </lightning-layout-item>
+                </template>
+                <!-- Desc for Other Ends -->
+
+                <!-- Upload Image File Starts -->
+                <lightning-layout-item size="6" padding="horizontal-small">
+                    <div class="slds-form-element">
+                        <lightning-input type="file" label={label.trStandForm_UploadImage} accept=".pdf, .png, .jpeg"
+                            onchange={handleStandFileChange} required={isExistingStand}></lightning-input>
+                        <template if:true={hasStandImgFile}>
+                            <div class="slds-text-body_small">{standImageFile.name}
+                                <lightning-icon class="slds-p-left_x-small" icon-name="utility:success" size="x-small">
+                                </lightning-icon>
+                            </div>
+                        </template>
+                    </div>
+                    <template if:true={isBlankStandImageFile}>
+                        <div class="slds-form-element__help slds-text-color_error">{label.requiredField}</div>
+                    </template>
+                </lightning-layout-item>
+                <!-- Upload Image File Ends -->
+            </lightning-layout>
+        </div>
+        <footer class="slds-card__footer"></footer>
+    </article>
+    <!-- Stand Layout Ends -->
+
+    <!-- Panel Layout Starts -->
+
+    <table
+        class="slds-table slds-table--bordered slds-table--cell-buffer slds-table slds-table_bordered slds-table_resizable-cols"
+        role="grid">
+        <thead>
+            <tr class="slds-text-title--caps" style="background: #f7f9fb">
+                <th class="slds-is-resizable" scope="col" style="width: 1px;text-align: left">
+                    <div class="slds-cell-wrap"> # </div>
+                </th>
+                <template if:true={isOtherWithPanel}>
+                    <th class="slds-is-resizable" scope="col" style="text-align: center">
+                        <div class="slds-cell-wrap">{label.trStandForm_Actions}</div>
+                    </th>
+                </template>
+                <template if:false={isOtherWithPanel}>
+                    <th class="slds-is-resizable" scope="col" style="text-align: center">
+                        <div class="slds-cell-wrap">{label.trStandForm_PanelCode}</div>
+                    </th>
+                </template>
+                <template if:true={showSerieLayout}>
+                    <th class="slds-is-resizable" scope="col" style="text-align: center">
+                        <div class="slds-cell-wrap">{label.trStandForm_PanelSerie}</div>
+                    </th>
+                </template>
+                <th class="slds-is-resizable" scope="col" style="text-align: center;width: 40%;">
+                    <div class="slds-cell-wrap">{label.trStandForm_PanelUploadImage}</div>
+                </th>
+                <th class="slds-is-resizable" scope="col" style="text-align: center;">
+                    <div class="slds-cell-wrap">{label.trStandForm_PanelStatus}</div>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <template for:each={panels} for:item="panel" if:true={showPanelSection}>
+                <tr key={panel.index} class="hooks-table__section hooks-table__section_end">
+
+                    <!-- Row No -->
+                    <td class="slds-cell-wrap">
+                        {panel.index}
+                    </td>
+
+                    <!-- Button Delete -->
+                    <template if:true={isOtherWithPanel}>
+                        <td class="slds-cell-wrap">
+                            <lightning-button-icon name={panel.index} onclick={handleDeleteItem}
+                                icon-name="utility:delete" alternative-text="Delete Item"
+                                class="slds-m-left_xx-small slds-align_absolute-center"
+                                title="Delete Item"></lightning-button-icon>
+                        </td>
+                    </template>
+
+                    <!-- Search Panel Code -->
+                    <template if:false={isOtherWithPanel}>
+                        <td class="slds-cell-wrap">
+                            <c-lwc-look-up input-id={panel.index} input-data-id={panel.index}
+                                input-placeholder="Search Panel" input-required="false" input-search={handlePanelSearch}
+                                input-selected-record-id={panel.productId} input-selected-label={panel.productName}
+                                input-additional-criteria={panelCodeSearchFilter}
+                                oninputselect={handlePanelSelect}></c-lwc-look-up>
+                        </td>
+                    </template>
+
+                    <!-- Search Serie Name -->
+                    <template if:true={showSerieLayout}>
+                        <td class="slds-cell-wrap">
+                            <c-lwc-look-up input-id={panel.index} input-data-id={panel.index}
+                                input-placeholder="Search Serie" input-required="false" input-search={handleSerieSearch}
+                                input-selected-record-id={panel.serieId} input-selected-label={panel.serieId}
+                                oninputselect={handleSerieSelect}></c-lwc-look-up>
+                        </td>
+                    </template>
+
+                    <!-- Upload Image File -->
+                    <td class="slds-cell-wrap">
+                        <div class="slds-grid">
+                            <div class="slds-col">
+                                <lightning-input name={panel.index} type="file" variant="label-hidden"
+                                    accept=".pdf, .png, .jpeg" onchange={handlePanelFileChange}></lightning-input>
+                            </div>
+                            <div class="slds-col" style="width:30%;overflow:auto">
+                                <template if:true={panel.file}>
+                                    <div class="slds-text-body_small">{panel.file.name}
+                                        <lightning-icon class="slds-p-left_x-small" icon-name="utility:success"
+                                            size="x-small">
+                                        </lightning-icon>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </td>
+
+                    <!-- Panel Status -->
+                    <td class="slds-cell-wrap">
+                        <c-lwc-select input-id={panel.index} input-value="Active"
+                            input-options={filteredPanelStatusOptions}
+                            oninputselect={handlePanelStatusChange}></c-lwc-select>
+                    </td>
+                </tr>
+            </template>
+
+            <!-- Button Add Item -->
+            <template if:true={isOtherWithPanel}>
+                <tr class="hooks-table__section hooks-table__section_end">
+                    <td class="slds-cell-wrap">
+                        <lightning-button-icon onclick={handleAddItem} icon-name="utility:add"
+                            alternative-text="Add Item" class="slds-m-left_xx-small slds-align_absolute-center"
+                            title="Add Item">Add
+                            Item</lightning-button-icon>
+                    </td>
+                    <td colspan="5" class="slds-cell-wrap">
+                    </td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+
+    <!-- Panel Layout Ends -->
+</template>
